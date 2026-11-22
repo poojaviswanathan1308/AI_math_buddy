@@ -59,6 +59,7 @@ def convert_math(node, symbols):
     raise ValueError("Please enter a valid maths expression.")
 
 def symbolic_expression(value, symbols):
+    value = value.strip()
     tree = ast.parse(value.replace("^", "**"), mode="eval")
     return convert_math(tree, symbols)
 
