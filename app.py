@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import ast
 import math
 import random
+import re
 
 st.set_page_config(
     page_title="AI Math Buddy",
@@ -61,6 +62,16 @@ def symbolic_expression(value, symbols):
     tree = ast.parse(value.replace("^", "**"), mode="eval")
     return convert_math(tree, symbols)
 
+def equation_expression(value, symbols):
+    value = value.strip().replace("^", "**")
+
+    value = re.sub(r'(\d)\s*([xy(])', r'\1*\2', value)
+    value = re.sub(r'([xy])\s*\(', r'\1*(', value)
+    value = re.sub(r'\)\s*([xy(])', r')*\1', value)
+
+    tree = ast.parse(value, mode="eval")
+    return convert_math(tree, symbols)
+    
 def numeric_expression(value):
     symbols = {"x": sp.Symbol("x")}
     result = symbolic_expression(value, symbols)
@@ -184,8 +195,8 @@ elif page == "✏️ Equation Solver":
             left, right = equation.split("=")
             x, y = sp.symbols("x y")
             symbols = {"x": x, "y": y}
-            lhs = symbolic_expression(left, symbols)
-            rhs = symbolic_expression(right, symbols)
+            lhs = equation_expression(left, symbols)
+            rhs = equation_expression(right,symbols)
             result = sp.expand(lhs - rhs)
             variables = sorted(result.free_symbols, key=str)
 
